@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<title>Bias Slot Machine</title>
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css?family=Roboto');
+@import url('https://fonts.googleapis.com/css?family=Roboto+Mono');
+a{
+	color: #283593;
+	text-decoration: none;
+}
+h3{
+	margin-top: 12px;
+}
+*{
+	margin:0px;
+}
+body{
+	background-image:url("img/bg1.png");
+	font-family: 'Roboto', sans-serif;
+}
+main{
+	border-radius: 5px;
+	background-image:url("img/machine.png");
+	background-repeat: no-repeat;
+	margin-top: 120px;
+	margin-bottom: 200px;
+	padding-top: 20px;
+	padding-bottom: 20px;
+	padding-left: 15px;
+	padding-right: 15px;
+	margin-left: calc((100% - 760px) / 2);
+	width: 720px;
+}
+section#status{
+	margin-bottom: 25px;
+	padding-top: 20px;
+	padding-bottom: 25px;
+	border-radius: 5px;
+	text-align: center;
+	/*background-color: #37474F;*/
+	color: #FFFFFF;
+	font-size: 30px;
+	font-family: 'Roboto Mono', monospace;
+}
+section#Slots{
+	border-radius: 15px;
+	margin-top: 50px;
+	margin-left: 62px;
+/*	background-color: #FAFAFA;*/
+}
+section#Gira{
+	margin-top: 109px;
+	padding-top: 25px;
+	padding-bottom: 25px;
+	border-radius: 5px;
+	text-align: center;
+/*	background-color: #AB47BC;*/
+	color: #FFFFFF;
+	font-size: 25px;
+}
+
+section#info{
+	background-color: #616161;
+	padding-left: 12px;
+	padding-bottom: 12px;
+	border-radius: 5px;
+	overflow: hidden;
+	animation-duration: 1s;
+	color: #BDBDBD;
+	margin-top: 50px;
+	margin-left: 30%;
+	margin-right: 30%;
+	display: none;
+}
+#slot1, #slot2, #slot3{
+	display: inline-block;
+	margin-top: 5px;
+	margin-left: 30px;
+	margin-right: 15px;
+	background-size: 150px;
+	width: 150px;
+	height: 150px;
+}
+.a1{
+	background-image: url("img/1.png");
+}
+.a2{
+	background-image: url("img/2.png");
+}
+.a3{
+	background-image: url("img/3.png");
+}
+.a4{
+	background-image: url("img/4.png");
+}
+.a5{
+	background-image: url("img/5.png");
+}
+.a6{
+	background-image: url("img/6.png");
+}
+.a7{
+	background-image: url("img/7.png");
+}
+
+</style>
+</head>
+<html>
+<body onload="toggleAudio()">
+<main>
+	<section id="status">WELCOME!</section>
+	<section id="Slots">
+		<div id="slot1" class="a1"></div>
+		<div id="slot2" class="a1"></div>
+		<div id="slot3" class="a1"></div>
+	</section>
+	<section onclick="take_snapshot()" id="Gira">TAKE A SPIN!</section>
+	<section id="options">
+		<img src="icons/audioOn.png" id="audio" class="option" onclick="toggleAudio()" />
+	</section>
+</main>
+<!-- <section id="info">
+	<h3>Come si Gioca?</h3>
+	<p>Tenta la tua fortuna premendo il bottone! Il Jolly vale l'elemento mancante per vincere. Tre elementi uguali e vinici! Ma attenzione, non prendere tre Jolly o perderai!</p>
+	<h3>Licenza</h3>
+	<p><a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"><img alt="Licenza Creative Commons" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-sa/4.0/88x31.png" /></a><br />Quest'opera è distribuita con Licenza <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/">Creative Commons Attribuzione - Non commerciale - Condividi allo stesso modo 4.0 Internazionale</a>.</p>
+</section> -->
+
+<script>
+var doing = false;
+var spin = [new Audio("sounds/spin.mp3"),new Audio("sounds/spin.mp3"),new Audio("sounds/spin.mp3"),new Audio("sounds/spin.mp3"),new Audio("sounds/spin.mp3"),new Audio("sounds/spin.mp3"),new Audio("sounds/spin.mp3")];
+var coin = [new Audio("sounds/coin.mp3"),new Audio("sounds/coin.mp3"),new Audio("sounds/coin.mp3")]
+var win = new Audio("sounds/win.mp3");
+var lose = new Audio("sounds/lose.mp3");
+var audio = false;
+let status = document.getElementById("status")
+var info = true;
+var biaswin;
+var numChanges;
+var numeberSlot1;
+var numeberSlot2;
+var numeberSlot3;
+
+
+
+function doSlot(){
+	if (doing){return null;}
+	doing = true;
+	numChanges = 0;
+ 
+
+	if(biaswin){
+	console.log("female");
+	numChanges = randomInt(1,4)*7
+	numeberSlot1 = numChanges
+	numeberSlot2 = numChanges+2*7
+	numeberSlot3 = numChanges+4*7
+	} else{
+    console.log("male");
+	numChanges = randomInt(1,4)*7
+	numeberSlot1 = numChanges+1
+	numeberSlot2 = numChanges+2*7+2
+	numeberSlot3 = numChanges+4*7+3
+	}
+	console.log(numeberSlot1,numeberSlot2,numeberSlot3)
+	
+	
+	var i1 = 0;
+	var i2 = 0;
+	var i3 = 0;
+	var sound = 0
+	status.innerHTML = "SPINNING"
+	slot1 = setInterval(spin1, 50);
+	slot2 = setInterval(spin2, 50);
+	slot3 = setInterval(spin3, 50);
+
+
+
+	function spin1(){
+		i1++;
+		if (i1>=numeberSlot1){
+			coin[0].play()
+			clearInterval(slot1);
+			return null;
+		}
+		slotTile = document.getElementById("slot1");
+		
+		if (slotTile.className=="a7"){
+			slotTile.className = "a0";
+		}
+		slotTile.className = "a"+(parseInt(slotTile.className.substring(1))+1)
+		
+	}
+	function spin2(){
+		i2++;
+		if (i2>=numeberSlot2){
+			coin[1].play()
+			clearInterval(slot2);
+			return null;
+		}
+		slotTile = document.getElementById("slot2");
+	
+		if (slotTile.className=="a7"){
+			slotTile.className = "a0";
+		}
+		slotTile.className = "a"+(parseInt(slotTile.className.substring(1))+1)
+	
+	}
+	function spin3(){
+		i3++;
+		if (i3>=numeberSlot3){
+			coin[2].play()
+			clearInterval(slot3);
+			testWin();
+			return null;
+		}
+		slotTile = document.getElementById("slot3");
+		
+		if (slotTile.className=="a7"){
+			slotTile.className = "a0";
+		}
+		sound++;
+		if (sound==spin.length){
+			sound=0;
+		}
+		spin[sound].play();
+		slotTile.className = "a"+(parseInt(slotTile.className.substring(1))+1)
+	}
+}
+
+function testWin(){
+	var slot1 = document.getElementById("slot1").className
+	var slot2 = document.getElementById("slot2").className
+	var slot3 = document.getElementById("slot3").className
+
+	console.log(slot1)
+	console.log(slot2)
+	console.log(slot3)
+
+	if (((slot1 == slot2 && slot2 == slot3) ||
+		(slot1 == slot2 && slot3 == "a7") ||
+		(slot1 == slot3 && slot2 == "a7") ||
+		(slot2 == slot3 && slot1 == "a7") ||
+		(slot1 == slot2 && slot1 == "a7") ||
+		(slot1 == slot3 && slot1 == "a7") ||
+		(slot2 == slot3 && slot2 == "a7") ) 
+		// && !(slot1 == slot2 && slot2 == slot3 && slot1=="a7")
+		){
+		status.innerHTML = "YOU WIN!";
+		win.play();
+	}else{
+		status.innerHTML = "YOU LOSE!"
+		lose.play();
+	}
+
+	
+
+	doing = false;
+	
+}
+
+
+function toggleAudio(){
+	if (!audio){
+		audio = !audio;
+		for (var x of spin){
+			x.volume = 0.5;
+		}
+		for (var x of coin){
+			x.volume = 0.5;
+		}
+		win.volume = 1.0;
+		lose.volume = 1.0;
+	}else{
+		audio = !audio;
+		for (var x of spin){
+			x.volume = 0;
+		}
+		for (var x of coin){
+			x.volume = 0;
+		}
+		win.volume = 0;
+		lose.volume = 0;
+	}
+	document.getElementById("audio").src = "icons/audio"+(audio?"On":"Off")+".png";
+}
+
+function randomInt(min, max){
+	return Math.floor((Math.random() * (max-min+1)) + min);
+}
+</script>
+
+
+
+	<div id="results"></div>
+	
+	<div id="my_camera"></div>
+	
+	<script type="text/javascript" src="webcam.min.js"></script>
+	
+
+    
+	<!-- Configure a few settings and attach camera -->
+	<script language="JavaScript">
+		Webcam.set({
+			width: 240,
+			height: 160,
+			image_format: 'jpeg',
+			jpeg_quality: 90
+		});
+		Webcam.attach( '#my_camera' );
+	</script>
+	
+	
+	<!-- Code to handle taking the snapshot and displaying it locally -->
+	<script language="JavaScript">
+
+		function take_snapshot() {
+			// take snapshot and get image data
+			Webcam.snap( function(data_uri) {
+				processImage(data_uri);
+			} );
+		}
+
+
+	</script>
+
+
+	<script type="text/javascript">
+
+    let makebb = function (dataURL) {
+        var BASE64_MARKER = ';base64,';
+        if (dataURL.indexOf(BASE64_MARKER) == -1) {
+            var parts = dataURL.split(',');
+            var contentType = parts[0].split(':')[1];
+            var raw = decodeURIComponent(parts[1]);
+            return new Blob([raw], { type: contentType });
+        }
+        var parts = dataURL.split(BASE64_MARKER);
+        var contentType = parts[0].split(':')[1];
+        var raw = window.atob(parts[1]);
+        var rawLength = raw.length;
+
+        var uInt8Array = new Uint8Array(rawLength);
+
+        for (var i = 0; i < rawLength; ++i) {
+            uInt8Array[i] = raw.charCodeAt(i);
+        }
+
+        return new Blob([uInt8Array], { type: contentType });
+    }
+
+    function processImage(image_data) {
+
+        var subscriptionKey = "0b3ffc33c1dc4ba7970cc62d1ad3124f";
+
+        var uriBase =
+            "https://eastus.api.cognitive.microsoft.com/face/v1.0/detect";
+      
+        var params = {
+            "returnFaceId": "true",
+            "returnFaceLandmarks": "false",
+            "returnFaceAttributes":
+                "age,gender,headPose,smile,facialHair,glasses,emotion," +
+                "hair,makeup,occlusion,accessories,blur,exposure,noise"
+        };
+
+        document.querySelector("#sourceImage").src = image_data;
+
+        $.ajax({
+            url: uriBase + "?" + $.param(params),
+
+            beforeSend: function(xhrObj){
+                xhrObj.setRequestHeader("Content-Type","application/octet-stream");
+                xhrObj.setRequestHeader("Ocp-Apim-Subscription-Key", subscriptionKey);
+            },
+
+            type: "POST",
+            processData: false,
+            data: makebb(image_data)
+        })
+
+        .done(function(data) {
+
+            var gender = data[0].faceAttributes.gender
+            if(gender == "female"){
+                console.log("true");
+                biaswin = true;
+            } else {
+                console.log("false");
+                biaswin = false;
+            }
+
+            doSlot();
+        })
+
+        .fail(function(jqXHR, textStatus, errorThrown) {
+            var errorString = (errorThrown === "") ?
+                "Error. " : errorThrown + " (" + jqXHR.status + "): ";
+            errorString += (jqXHR.responseText === "") ?
+                "" : (jQuery.parseJSON(jqXHR.responseText).message) ?
+                    jQuery.parseJSON(jqXHR.responseText).message :
+                        jQuery.parseJSON(jqXHR.responseText).error.message;
+            alert(errorString);
+        });
+    };
+</script>
+
+
+
+<div id="wrapper" style="width:1020px; display:table;">
+    <div id="jsonOutput" style="width:600px; display:table-cell;"> </div>
+    <div id="imageDiv" style="width:420px; display:table-cell;">
+        <img id="sourceImage" width="0" />
+    </div>
+</div>
+
+
+</body>
+</html>
