@@ -433,6 +433,10 @@ function randomInt(min, max){
 
         .done(function(data) {
             console.log(data);
+            if (data === undefined || data.length == 0) {
+              alert("Cannot recognize your gender from the photo");
+              return;
+            }
             var gender = data[0].faceAttributes.gender
             if(gender == "female"){
                 console.log("true");
